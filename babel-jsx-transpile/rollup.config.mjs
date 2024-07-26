@@ -18,7 +18,7 @@ export default {
         commonjs(),
         babel({
             babelHelpers: "bundled",
-            babelrc: true,
+            configFile: "./babel.config.json",
         }),
         json(),
     ],
