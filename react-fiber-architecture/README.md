@@ -124,3 +124,36 @@ function FiberNode(tag, pendingProps, key, mode) {
 -   리액트가 Fiber 를 처리시, 직접 `바로 처리` 하거나 `스케쥴링`
 
 ## React Fiber Tree
+
+리액트에서 Fiber Tree 는 두개가 존재
+
+1. 현재 모습을 담은 `Current` Fiber Tree
+2. 작업중인 상태를 나타내는 `workInProgress` 트리
+
+리액트 파이버 작업이 끝나면, <br/>
+리액트는 단순히 포인터만 변경해 `workInProgress` 트리를 현재 트리로 바꿈 (`더블 버퍼링`)
+
+#### 더블 버퍼링
+
+컴퓨터 그래픽 분야에서, 다음 그려야할 그림을 미리 그리고, <br/>
+완성되면 현재 상태를 새로운 그림으로 바꾸는 기법
+
+리액트의 더블 버퍼링은 `커밋` 단계에서 수행됨
+
+#### Fiber Tree 작업 순서
+
+1. `beginWork()` 로 파이버 작업 수행. 리프 Fiber Tree Node 만날때 까지 수행
+2. 1의 작업이 끝나면 `completeWork()` 로 파이버 작업 완료
+3. sibling (형제) 노드가 있는 경우 형제 노드로 넘어감
+4. 2,3 이 끝나면 return 으로 돌아가 작업을 완료
+
+#### workInProgress 트리의 재 빌드
+
+setState ... 등 업데이트 발생시... workInProgress 트리를 재빌드함
+
+반복적인 Reconcilation 이 일어날때, workInProgress 트리를 `다시 생성하는것이 아닌`, <br/>
+가급적 Fiber Node 를 재활용해, 기존의 Fiber 를 사용해 내부 속성값만 초기화 / 바꿈
+
+> 과거 동기식으로 실행됐던 이 작업은, 우선순위가 높은 다른 업데이트가 오면 현재 업데이트 작업을 중단하거나 새롭게 만들거나 폐기함. (단, 브라우저에 반영되는 작업은 동기적으로 이루어짐)
+
+> Fiber Tree 와 V-DOM 은 동일한 개념이 아님! Fiber Tree 의 Reconcilation 알고리즘은 ... React Native 에서는 V-DOM 이 아닌 다른 애플리케이션 환경에서 사용할 수 있게 됨
